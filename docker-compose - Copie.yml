@@ -1,0 +1,83 @@
+version: "2"
+
+services:
+  node_demo:
+    image: busybox:latest
+    command: ["true"]
+    volumes:
+        - ../node_demo/dist:/data/node_demo #for node
+
+  jekyll_demo:
+    image: busybox:latest
+    command: ["true"]
+    volumes:
+        - ../jekyll_demo/dist:/data/jekyll_demo #for jekyll
+
+  nginx:
+    build: ./images/nginx
+    image: dockerdemo_nginx
+    env_file: docker_env.env
+    ports:
+        - 5000:80
+    links:
+        - node:node1
+        - node2:node2
+        - node3:node3
+    volumes_from:
+        - node_demo
+        - jekyll_demo
+
+  mongodb:
+    build: ./images/mongodb
+    image: dockerdemo_mongodb
+    env_file: docker_env.env
+    ports:
+        - 27017:27017
+    volumes_from:
+        - node_demo
+        - jekyll_demo
+
+  redis:
+    build: ./images/redis
+    image: dockerdemo_redis
+    env_file: docker_env.env
+    ports:
+        - 6379:6379
+    volumes_from:
+        - node_demo
+        - jekyll_demo
+
+  node:
+    build: ./images/node
+    image: dockerdemo_node
+    env_file: docker_env.env
+    # ports:
+    #      - 5060:8080
+    links:
+        - mongodb
+        - redis
+    volumes_from:
+        - node_demo
+        - jekyll_demo
+  node2:
+    build: ./images/node
+    env_file: docker_env.env
+    # ports:
+    #      - 5061:8080
+    links:
+        - mongodb
+        - redis
+    volumes_from:
+        - node_demo
+        - jekyll_demo
+  node3:
+    build: ./images/node
+    env_file: docker_env.env
+    # ports:
+    #      - 5062:8080
+    links:
+        - mongodb
+        - redis
+    volumes_from:
+        - node_demo
+        - jekyll_demo

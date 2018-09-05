@@ -1,0 +1,39 @@
+pipeline {
+
+  environment {
+    registry = "nlahlou/docker-test"
+    registryCredential = 'docker'
+  }
+
+  agent any
+  stages {
+    stage('Cloning Git') {
+      steps {
+        git 'https://github.com/gustavoapolinario/microservices-node-example-todo-frontend.git'
+      }
+    }
+    stage('Building image') {
+      steps{
+        script {
+          dockerImage = docker.build registry + ":$BUILD_NUMBER"
+        }
+      }
+    }
+    stage('docker run container') {
+      steps{
+        script {
+          def apiContainer = docker.image(registry + ":$BUILD_NUMBER").run("--name my-test --rm -d -p 3000:3000 ")
+        }
+      }
+    }
+    stage('Deploy Image') {
+      steps{
+        script {
+          docker.withRegistry( '', registryCredential ) {
+            dockerImage.push()
+          }
+        }
+      }
+    }
+  }
+}
