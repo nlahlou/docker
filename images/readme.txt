@@ -3,7 +3,6 @@ docker ps
 docker commit c3f279d17e0a nlahlou/nodedemo:version3
 
 
-
 docker run -v shared_volume:/var/jenkins_home:z -p 8080:8080 -p 50000:50000 --name nljenkins nlahlou/jenkins:version3
 docker container stop nljenkins 
 docker container start nljenkins
